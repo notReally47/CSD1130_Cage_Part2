@@ -1,21 +1,25 @@
 /******************************************************************************/
 /*!
 \file		Collision.cpp
-\author 	DigiPen
-\par    	email: digipen\@digipen.edu
-\date   	January 01, 20xx
+\author 	Ian Chua
+\par    	email: i.chua@digipen.edu
+\date   	March 21, 2023
 \brief
 
-Copyright (C) 20xx DigiPen Institute of Technology.
+Copyright (C) 2023 DigiPen Institute of Technology.
 Reproduction or disclosure of this file or its contents without the
 prior written consent of DigiPen Institute of Technology is prohibited.
  */
-/******************************************************************************/
+ /******************************************************************************/
 
 #include "main.h"
 
 /******************************************************************************/
 /*!
+* \brief Builds a line segment
+* \param lineSegment:	output
+* \param p0:			input - pt0 of line segment
+* \param p1:			input - pt1 of line segment
  */
 /******************************************************************************/
 void BuildLineSegment(LineSegment &lineSegment,
@@ -33,6 +37,15 @@ void BuildLineSegment(LineSegment &lineSegment,
 
 /******************************************************************************/
 /*!
+* \brief Checks if circle intersects a line
+* \param circle:			input - R, Bs
+* \param ptEnd:				input - Be
+* \param lineSeg:			input - n, p0, p1
+* \param interPt:			output - Bi
+* \param normalAtCollision:	output - reflection vector
+* \param interTime:			output - ti
+* \param checkLineEdges:	output
+* \return int: returns 1 if there is collision, 0 if there is none
  */
 /******************************************************************************/
 int CollisionIntersection_CircleLineSegment(const Circle &circle,
@@ -96,13 +109,15 @@ int CollisionIntersection_CircleLineSegment(const Circle &circle,
 
 /******************************************************************************/
 /*
-* \param withinBothLines:	
-* \param circle:			R, Bs
-* \param ptEnd:				Be
-* \param lineSeg:			n, p0, p1
-* \param interPt:			Bi
-* \param normalAtCollision:	
-* \param interTime:			ti
+* \brief Checks if circle will collide with line
+* \param withinBothLines:	input
+* \param circle:			input - R, Bs
+* \param ptEnd:				input - Be
+* \param lineSeg:			input - n, p0, p1
+* \param interPt:			output - Bi
+* \param normalAtCollision:	output - reflection vector 
+* \param interTime:			output - ti
+* \return int: returns 1 if there is collision, 0 if there is none
 */
 /******************************************************************************/
 int CheckMovingCircleToLineEdge(bool withinBothLines,
@@ -120,14 +135,16 @@ int CheckMovingCircleToLineEdge(bool withinBothLines,
 	CSD1130::Vec2 P0P1	= lineSeg.m_pt1 - lineSeg.m_pt0;	// Line vector
 	CSD1130::Vec2 V		= ptEnd - circle.m_center;			// Velocity vector
 	CSD1130::Vec2 M		= { V.y, -V.x };					// Normal to velocity vector
+	CSD1130::Vec2 Vnorm;
 
 	CSD1130::Vector2DNormalize(M, M);						// normalize velocity vector's normal
+	CSD1130::Vector2DNormalize(Vnorm, V);					// normalize velocity vector
 
-	if (withinBothLines)
+	if (withinBothLines) // If ball falls within P0' and P1'
 	{
 		if (CSD1130::Vector2DDotProduct(BsP0, P0P1) > 0.f) // BsP0.V > 0
 		{
-			m = CSD1130::Vector2DDotProduct(BsP0, V);
+			m = CSD1130::Vector2DDotProduct(BsP0, Vnorm);
 			if (m > 0.f)
 			{
 				dist0 = CSD1130::Vector2DDotProduct(BsP0, M);
@@ -150,7 +167,7 @@ int CheckMovingCircleToLineEdge(bool withinBothLines,
 
 		else // (BsP1.P0P1 < 0)
 		{
-			m = CSD1130::Vector2DDotProduct(BsP1, V);
+			m = CSD1130::Vector2DDotProduct(BsP1, Vnorm);
 			if (m > 0.f)
 			{
 				dist1 = CSD1130::Vector2DDotProduct(BsP1, M);
@@ -181,13 +198,16 @@ int CheckMovingCircleToLineEdge(bool withinBothLines,
 		float dist0Abs = abs(dist0);
 		float dist1Abs = abs(dist1);
 
-		if (dist0Abs > circle.m_radius && dist1Abs > circle.m_radius)
+		if (dist0Abs > circle.m_radius && dist1Abs > circle.m_radius) // Ball not touching/intersecting
 			return 0;
 
 		else if (dist0Abs <= circle.m_radius && dist1Abs <= circle.m_radius)
 		{
-			float m0Abs = abs(CSD1130::Vector2DDotProduct(BsP0, V));
-			float m1Abs = abs(CSD1130::Vector2DDotProduct(BsP1, V));
+			float m0 = CSD1130::Vector2DDotProduct(BsP0, V);
+			float m1 = CSD1130::Vector2DDotProduct(BsP1, V);
+
+			float m0Abs = abs(m0);
+			float m1Abs = abs(m1);
 
 			P0Side = m0Abs < m1Abs ? true : false;
 		}
@@ -199,7 +219,7 @@ int CheckMovingCircleToLineEdge(bool withinBothLines,
 
 		if (P0Side)
 		{
-			m = CSD1130::Vector2DDotProduct(BsP0, V);
+			m = CSD1130::Vector2DDotProduct(BsP0, Vnorm);
 			if (m < 0.f)
 				return 0;
 			else
@@ -215,16 +235,15 @@ int CheckMovingCircleToLineEdge(bool withinBothLines,
 				}
 			}
 		} // end if P0Side
-
 		else
 		{
-			m = CSD1130::Vector2DDotProduct(BsP1, V);
+			m = CSD1130::Vector2DDotProduct(BsP1, Vnorm);
 			if (m < 0.f)
 				return 0;
 			else
 			{
-				s			= sqrt(circle.m_radius * circle.m_radius - dist1 * dist1);
-				interTime	= (m - s) / CSD1130::Vector2DLength(V);
+				s = sqrt(circle.m_radius * circle.m_radius - dist1 * dist1);
+				interTime = (m - s) / CSD1130::Vector2DLength(V);
 				if (interTime <= 1.f)
 				{
 					interPt				= circle.m_center + V * interTime; // Bi = Bs + V *ti
@@ -247,6 +266,11 @@ int CheckMovingCircleToLineEdge(bool withinBothLines,
 
 /******************************************************************************/
 /*!
+* \brief Collision response for collision between line and circle
+* \param ptInter::	input - point of intersection
+* \param normal:	input - normal at collision
+* \param ptEnd:		output - new end point of circle after collision
+* \param reflected:	output - reflection vector
  */
 /******************************************************************************/
 void CollisionResponse_CircleLineSegment(const CSD1130::Vec2 &ptInter,

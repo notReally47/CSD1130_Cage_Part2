@@ -1,16 +1,16 @@
 /******************************************************************************/
 /*!
 \file		Vector2D.h
-\author 	DigiPen
-\par    	email: digipen\@digipen.edu
-\date   	Feb 01, 2023
+\author 	Ian Chua
+\par    	email: i.chua@digipen.edu
+\date   	Feb 12, 2023
 \brief
 
 Copyright (C) 2023 DigiPen Institute of Technology.
 Reproduction or disclosure of this file or its contents without the
 prior written consent of DigiPen Institute of Technology is prohibited.
  */
-/******************************************************************************/
+ /******************************************************************************/
 
 #pragma once
 

@@ -1,12 +1,12 @@
 /******************************************************************************/
 /*!
 \file		GameState_Cage.cpp
-\author 	DigiPen
-\par    	email: digipen\@digipen.edu
-\date   	January 01, 20xx
+\author 	Ian Chua
+\par    	email: i.chua@digipen.edu
+\date   	March 21, 2023
 \brief
 
-Copyright (C) 20xx DigiPen Institute of Technology.
+Copyright (C) 2023 DigiPen Institute of Technology.
 Reproduction or disclosure of this file or its contents without the
 prior written consent of DigiPen Institute of Technology is prohibited.
  */
@@ -279,9 +279,6 @@ void GameStateCageInit(void)
 /******************************************************************************/
 void GameStateCageUpdate(void)
 {
-	if (AEInputCheckTriggered(AEVK_SPACE)) pause = !pause;
-
-	if (pause) return;
 	static bool full_screen_me;
 	if (AEInputCheckTriggered(AEVK_F))
 	{

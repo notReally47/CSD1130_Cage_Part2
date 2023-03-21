@@ -1,9 +1,9 @@
 /******************************************************************************/
 /*!
 \file		Matrix3x3.h
-\author 	DigiPen
-\par    	email: digipen\@digipen.edu
-\date   	Feb 01, 2023
+\author 	Ian Chua
+\par    	email: i.chua@digipen.edu
+\date   	Feb 12, 2023
 \brief
 
 Copyright (C) 2023 DigiPen Institute of Technology.
