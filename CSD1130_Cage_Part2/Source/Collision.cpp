@@ -69,8 +69,9 @@ int CollisionIntersection_CircleLineSegment(const Circle &circle,
 	
 	if (NBs - NP0 <= -circle.m_radius)
 	{
-		BsP0 = (lineSeg.m_pt0 - circle.m_radius * lineSeg.m_normal) - circle.m_center;	// Shortest distance from point to imaginary (P0') line segment
-		BsP1 = (lineSeg.m_pt1 - circle.m_radius * lineSeg.m_normal) - circle.m_center;	// Shortest distance from point to imaginary (P1') line segment
+		// Line vector from circle center to P'
+		BsP0 = (lineSeg.m_pt0 - circle.m_radius * lineSeg.m_normal) - circle.m_center;
+		BsP1 = (lineSeg.m_pt1 - circle.m_radius * lineSeg.m_normal) - circle.m_center;
 
 		if (CSD1130::Vector2DDotProduct(M, BsP0) * CSD1130::Vector2DDotProduct(M, BsP1) < 0.f)
 		{
@@ -81,14 +82,15 @@ int CollisionIntersection_CircleLineSegment(const Circle &circle,
 				normalAtCollision	= -lineSeg.m_normal;
 				return 1;
 			}
-			else return CheckMovingCircleToLineEdge(false, circle, ptEnd, lineSeg, interPt, normalAtCollision, interTime);
 		}
-
+		else if (checkLineEdges)
+			return CheckMovingCircleToLineEdge(false, circle, ptEnd, lineSeg, interPt, normalAtCollision, interTime);
 	}
 	else if (NBs - NP0 >= circle.m_radius)
 	{
-		BsP0 = (lineSeg.m_pt0 + circle.m_radius * lineSeg.m_normal) - circle.m_center;	// Shortest distance from point to imaginary (P0') line segment
-		BsP1 = (lineSeg.m_pt1 + circle.m_radius * lineSeg.m_normal) - circle.m_center;	// Shortest distance from point to imaginary (P1') line segment
+		// Line vector from circle center to P'
+		BsP0 = (lineSeg.m_pt0 + circle.m_radius * lineSeg.m_normal) - circle.m_center;
+		BsP1 = (lineSeg.m_pt1 + circle.m_radius * lineSeg.m_normal) - circle.m_center;
 
 		if (CSD1130::Vector2DDotProduct(M, BsP0) * CSD1130::Vector2DDotProduct(M, BsP1) < 0.f)
 		{
@@ -99,10 +101,12 @@ int CollisionIntersection_CircleLineSegment(const Circle &circle,
 				normalAtCollision	= lineSeg.m_normal;
 				return 1;
 			}
-			else return CheckMovingCircleToLineEdge(false, circle, ptEnd, lineSeg, interPt, normalAtCollision, interTime);
 		}
+		else if (checkLineEdges)
+			return CheckMovingCircleToLineEdge(false, circle, ptEnd, lineSeg, interPt, normalAtCollision, interTime);
 	}
-	else return CheckMovingCircleToLineEdge(true, circle, ptEnd, lineSeg, interPt, normalAtCollision, interTime);
+	else if (checkLineEdges) 
+		return CheckMovingCircleToLineEdge(true, circle, ptEnd, lineSeg, interPt, normalAtCollision, interTime);
 
 	return 0;
 }
